@@ -1,6 +1,6 @@
 ---
 - name: Install htop on all CentOS and Debian servers
-  hosts: main,centos,debian
+  hosts: all
   become: yes
 
   tasks:

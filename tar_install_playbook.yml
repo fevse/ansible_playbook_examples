@@ -1,6 +1,6 @@
 ---
 - name: Install tar on all servers
-  hosts: main,centos,debian
+  hosts: all
   become: yes
 
   tasks:
