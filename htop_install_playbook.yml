@@ -1,0 +1,30 @@
+---
+- name: Install htop on all CentOS and Debian servers
+  hosts: main,centos,debian
+  become: yes
+
+  tasks:
+  - name: Check and Print OS version
+    debug: var=ansible_os_family
+    
+  - block: #Debian
+
+    - name: Install htop (Debian)
+      apt: name=htop state=latest
+
+    when: ansible_os_family == "Debian"
+
+  - block: #CentOS
+    
+    - name: Update dnf repositories
+      dnf:
+        name: '*'
+        state: latest
+    
+    - name: Install epel-release
+      dnf: name=epel-release state=latest 
+
+    - name: Install htop (CentOS)
+      dnf: name=htop state=latest
+
+    when: ansible_os_family == "RedHat" 
