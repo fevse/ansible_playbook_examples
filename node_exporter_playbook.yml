@@ -1,0 +1,71 @@
+---
+- name: Install and Run Prometheus node_exporter on Servers
+  hosts: web 
+  become: yes
+
+  tasks:
+  - name: Create node exporter group
+    group:
+      name: node_exporter
+      state: present
+
+  - name: Create node exporter user
+    user: 
+      name: node_exporter
+      group: node_exporter
+
+  - name: Download and extract node exporter
+    unarchive:
+      src: https://github.com/prometheus/node_exporter/releases/download/v1.9.1/node_exporter-1.9.1.linux-amd64.tar.gz
+      dest: /tmp/
+      remote_src: yes
+
+  - name: Copy binary file
+    copy:
+      remote_src: yes
+      src: /tmp/node_exporter-1.9.1.linux-amd64/node_exporter 
+      dest: /usr/bin/node_exporter
+      owner: node_exporter
+      group: node_exporter
+      mode: '0744'
+
+  - name: Copy service file to server 
+    copy:
+      dest: /etc/systemd/system/node_exporter.service
+      owner: root
+      group: root
+      mode: '0644'
+      content: |
+        [Unit]
+        Description=Prometheus Node Exporter
+        After=network.target
+
+        [Service]
+        User=node_exporter
+        Group=node_exporter
+        Type=simple
+        Restart=on-failure
+        ExecStart=/usr/bin/node_exporter
+
+        [Install]
+        WantedBy=multi-user.target
+
+  - name: Clear temp files and dirs
+    file:
+      path: /tmp/node_exporter-1.9.1.linux-amd64
+      state: absent
+
+  - name: Start service
+    service: 
+      name: node_exporter
+      state: started
+
+  - name: Enable service
+    service: 
+      name: node_exporter
+      enabled: yes
+  
+  - name: Open port
+    ufw: 
+      rule: allow
+      port: '9100'
