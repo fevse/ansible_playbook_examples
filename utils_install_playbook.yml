@@ -1,5 +1,5 @@
 ---
-- name: Install htop on all CentOS and Debian servers
+- name: Install utils on all CentOS and Debian servers
   hosts: all
   become: yes
 
@@ -9,7 +9,7 @@
     
   - block: #Debian
 
-    - name: Install htop (Debian)
+    - name: Install utils (Debian)
       apt: name={{ item }} state=latest
       loop: 
         - "tar"
@@ -33,7 +33,7 @@
     - name: Install epel-release
       dnf: name=epel-release state=latest 
 
-    - name: Install htop (CentOS)
+    - name: Install utils (CentOS)
       dnf: name={{ item }} state=latest
       loop: 
         - "tar"
